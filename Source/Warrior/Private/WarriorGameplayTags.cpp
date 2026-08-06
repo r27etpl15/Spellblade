@@ -67,6 +67,7 @@ namespace WarriorGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_ActivateRage, "Player.Event.ActivateRage")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_AOE, "Player.Event.AOE")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_ConsumesStones, "Player.Event.ConsumesStones")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Spawn_MagicMissile, "Player.Event.Spawn.MagicMissile")
 	
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "Player.Status.JumpToFinisher")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Rolling, "Player.Status.Rolling")

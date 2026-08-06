@@ -105,14 +105,16 @@ void AWarriorProjectileBase::OnProjectileBeginOverlap(UPrimitiveComponent* Overl
 	
 	if (APawn* HitPawn = Cast<APawn>(OtherActor))
 	{
-		if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(GetInstigator(), HitPawn))
+		if (!UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(GetInstigator(), HitPawn))
 		{
-			FGameplayEventData Data;
-			Data.Instigator = GetInstigator();
-			Data.Target = HitPawn;
-			
-			HandleApplyProjectileDamage(HitPawn, Data);
+			return;
 		}
+		
+		FGameplayEventData Data;
+		Data.Instigator = GetInstigator();
+		Data.Target = HitPawn;
+			
+		HandleApplyProjectileDamage(HitPawn, Data);
 	}
 }
 
