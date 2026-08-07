@@ -57,7 +57,13 @@ void ASpellbladeMagicMissile::OnProjectileBeginOverlap(UPrimitiveComponent* Over
 	Super::OnProjectileBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep,
 	                                SweepResult);
 	
-	BP_OnSpawnProjectileOverlapFX(SweepResult.ImpactPoint);
+	if (APawn* HitPawn = Cast<APawn>(OtherActor))
+	{
+		if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(GetInstigator(), HitPawn))
+		{
+			BP_OnSpawnProjectileOverlapFX(SweepResult.ImpactPoint);
+		}
+	}
 	
 	HitTargets.AddUnique(OtherActor);
 	GetAvailableActorsToFly();

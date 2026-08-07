@@ -46,8 +46,6 @@ void UBTDecorator_ShouldAbortAllLogic::InitializeFromAsset(UBehaviorTree& Asset)
 bool UBTDecorator_ShouldAbortAllLogic::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp,
 	uint8* NodeMemory) const
 {
-	Debug::Print(TEXT("开始判断"));
-	
 	UObject* ActorObject = OwnerComp.GetBlackboardComponent()->GetValueAsObject(InTargetActorKey.SelectedKeyName);
 	AActor* TargetActor = Cast<AActor>(ActorObject);
 	
@@ -63,20 +61,16 @@ bool UBTDecorator_ShouldAbortAllLogic::CalculateRawConditionValue(UBehaviorTreeC
 		if (UWarriorBlueprintFunctionLibrary::NativeDoesActorHaveTag(TargetActor, 
 		WarriorGameplayTags::Shared_Status_Dead))
 		{
-			Debug::Print(TEXT("bIsTargetActorDead = true"));
 			bIsTargetActorDead = true;
 		}
 		if (UWarriorBlueprintFunctionLibrary::NativeDoesActorHaveTag(OwningPawn, 
 			WarriorGameplayTags::Shared_Status_Dead))
 		{
-			Debug::Print(TEXT("bIsOwningAIDead = true"));
 			bIsOwningAIDead = true;
 		}
 	
 		if (FMath::IsNearlyZero(DistToTarget) || bIsTargetActorDead || bIsOwningAIDead)
 		{
-			Debug::Print(TEXT("中止所有节点"));
-		
 			return true;
 		}
 	}
