@@ -32,6 +32,12 @@ void ASpellbladeMagicMissile::Tick(float DeltaSecond)
 		SetActorRotation(TargetRotation);
 		ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
 	}
+	else if (!CurrentFaceActor.IsValid() && bShouldFaceToTarget)
+	{
+		GetAvailableActorsToFly();
+	
+		CurrentFaceActor = GetNearestTargetFromAvailableActors(AvailableActorsToFly);
+	}
 }
 
 void ASpellbladeMagicMissile::BeginPlay()
@@ -62,6 +68,8 @@ void ASpellbladeMagicMissile::OnProjectileBeginOverlap(UPrimitiveComponent* Over
 		CurrentOverlapNums++;
 		
 		bShouldFaceToTarget = true;
+		
+		SetLifeSpan(5.0f);
 	}
 	else
 	{
