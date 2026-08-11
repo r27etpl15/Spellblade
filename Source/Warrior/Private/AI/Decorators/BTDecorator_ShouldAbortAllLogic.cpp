@@ -112,10 +112,20 @@ void UBTDecorator_ShouldAbortAllLogic::TickNode(UBehaviorTreeComponent& OwnerCom
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	if (CalculateRawConditionValue(OwnerComp, NodeMemory))
+	if (!CalculateRawConditionValue(OwnerComp, NodeMemory))
+	{
+		return;
+	}
+
+	APawn* OwningPawn = OwnerComp.GetAIOwner()->GetPawn();
+	if (OwningPawn && UWarriorBlueprintFunctionLibrary::NativeDoesActorHaveTag(
+		OwningPawn, WarriorGameplayTags::Shared_Status_Dead))
 	{
 		OwnerComp.StopLogic(TEXT("ShouldAbortAllLogic"));
-
+	}
+	else
+	{
+		OwnerComp.RequestExecution(this);
 	}
 }
 
