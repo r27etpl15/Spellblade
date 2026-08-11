@@ -83,12 +83,18 @@ void UBTDecorator_ShouldAbortAllLogic::OnBecomeRelevant(UBehaviorTreeComponent& 
 	UBlackboardComponent* BlackboardComponent = OwnerComp.GetBlackboardComponent();
 	if (BlackboardComponent)
 	{
-		FBlackboard::FKey KeyID = InDistToTargetKey.GetSelectedKeyID();
+		FBlackboard::FKey DistKeyID = InDistToTargetKey.GetSelectedKeyID();
 		
-		BlackboardComponent->RegisterObserver(KeyID, this, 
+		BlackboardComponent->RegisterObserver(DistKeyID, this, 
+			FOnBlackboardChangeNotification::CreateUObject(this, &ThisClass::OnBlackboardKeyValueChange));
+		
+		FBlackboard::FKey TargetActorKeyID = InTargetActorKey.GetSelectedKeyID();
+		
+		BlackboardComponent->RegisterObserver(TargetActorKeyID, this, 
 			FOnBlackboardChangeNotification::CreateUObject(this, &ThisClass::OnBlackboardKeyValueChange));
 	}
-	
+
+	bNotifyTick = true;
 }
 
 void UBTDecorator_ShouldAbortAllLogic::OnCeaseRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -97,6 +103,19 @@ void UBTDecorator_ShouldAbortAllLogic::OnCeaseRelevant(UBehaviorTreeComponent& O
 	if (BlackboardComponent)
 	{
 		BlackboardComponent->UnregisterObserversFrom(this);
+	}
+
+	bNotifyTick = false;
+}
+
+void UBTDecorator_ShouldAbortAllLogic::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
+
+	if (CalculateRawConditionValue(OwnerComp, NodeMemory))
+	{
+		OwnerComp.StopLogic(TEXT("ShouldAbortAllLogic"));
+
 	}
 }
 
@@ -111,6 +130,11 @@ EBlackboardNotificationResult UBTDecorator_ShouldAbortAllLogic::OnBlackboardKeyV
 	}
 	
 	if (ChangedKeyID == InDistToTargetKey.GetSelectedKeyID())
+	{
+		BehaviorTreeComponent->RequestExecution(this);
+	}
+	
+	if (ChangedKeyID == InTargetActorKey.GetSelectedKeyID())
 	{
 		BehaviorTreeComponent->RequestExecution(this);
 	}
