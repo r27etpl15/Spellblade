@@ -263,8 +263,6 @@ void UWarriorBlueprintFunctionLibrary::SaveCurrentGameDifficulty(EWarriorGameDif
 			WarriorGameplayTags::GameData_SaveGame_Slot_1.GetTag().ToString(),
 			0
 		);
-		
-		Debug::Print(bWasSaved ? TEXT("保存成功") : TEXT("保存失败"));
 	}
 }
 
@@ -278,8 +276,6 @@ bool UWarriorBlueprintFunctionLibrary::TryLoadSavedGameDifficulty(EWarriorGameDi
 		if (UWarriorSaveGame* WarriorSaveGameObject = Cast<UWarriorSaveGame>(SaveGameObject))
 		{
 			OutSavedDifficulty = WarriorSaveGameObject->SavedCurrentGameDifficulty;
-			
-			Debug::Print(TEXT("加载成功"), FColor::Green);
 			
 			return true;
 		}

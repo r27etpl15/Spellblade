@@ -223,8 +223,6 @@ void AWarriorSurvivalGameMode::RegisterSpawnedEnemies(const TArray<AWarriorEnemy
 		{
 			CurrentSpawnedEnemiesCounter++;
 			
-			Debug::Print(TEXT("CurrentSpawnedEnemiesCounter"), CurrentSpawnedEnemiesCounter);
-			
 			SpawnedEnemy->OnDestroyed.AddUniqueDynamic(this, &ThisClass::OnEnemyDestroyed);
 		}
 	}
