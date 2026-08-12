@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "WarriorDebugHelper.h"
+#include "WarriorGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -109,7 +110,10 @@ void ASpellbladeMagicMissile::GetAvailableActorsToFly()
 		{
 			if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(GetInstigator(), Cast<APawn>(HitActor)))
 			{
-				if (HitTargets.Contains(HitActor)) { continue; }
+				if (HitTargets.Contains(HitActor) || UWarriorBlueprintFunctionLibrary::NativeDoesActorHaveTag(HitActor, WarriorGameplayTags::Shared_Status_Dead))
+				{
+					continue;
+				}
 				
 				AvailableActorsToFly.AddUnique(HitActor);
 				

@@ -115,7 +115,7 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
 	// 计算重击的伤害
 	if (UsedHeavyAttackComboCount != 0)
 	{
-		// 重击连招最多两次，最高增加30%的伤害
+		// 重击连招最多四次，最高增加60%的伤害
 		const float DamageIncreasePercentHeavy = UsedHeavyAttackComboCount * 0.15f + 1.0f;
 		
 		BaseDamage *= DamageIncreasePercentHeavy;
@@ -124,7 +124,7 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
 	
 	// 计算最终的伤害并修改
 	const float FinalDamageDone = BaseDamage * SourceAttackPower / TargetDefensePower;
-	// Debug::Print(TEXT("FinalDamageDone"), FinalDamageDone);
+	Debug::Print(TEXT("FinalDamageDone"), FinalDamageDone);
 	
 	if (FinalDamageDone > 0.0f)
 	{

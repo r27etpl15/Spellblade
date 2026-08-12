@@ -83,11 +83,14 @@ void UWarriorGameplayAbility::ApplyGameplayEffectSpecHandleToHitResult(const FGa
 	
 	APawn* OwningPawn = Cast<APawn>(GetAvatarActorFromActorInfo());
 	
+	TArray<APawn*> AlreadyHitPawns;
+	
 	for (const FHitResult& Hit : InHitResults)
 	{
 		if (APawn* HitPawn = Cast<APawn>(Hit.GetActor()))
 		{
-			if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(OwningPawn, HitPawn))
+			if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(OwningPawn, HitPawn)
+				&& !AlreadyHitPawns.Contains(HitPawn))
 			{
 				FActiveGameplayEffectHandle ActiveGameplayEffectHandle =
 					NativeApplyEffectSpecHandleToTarget(HitPawn, InSpecHandle);
@@ -103,6 +106,8 @@ void UWarriorGameplayAbility::ApplyGameplayEffectSpecHandleToHitResult(const FGa
 						WarriorGameplayTags::Shared_Event_HitReact,
 						Data
 					);
+					
+					AlreadyHitPawns.AddUnique(HitPawn);
 				}
 			}
 		}
