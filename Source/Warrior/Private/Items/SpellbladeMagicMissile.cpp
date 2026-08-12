@@ -3,6 +3,7 @@
 
 #include "Items/SpellbladeMagicMissile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "WarriorBlueprintFunctionLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -10,6 +11,7 @@
 #include "WarriorGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "AbilitySystem/WarriorAbilitySystemComponent.h"
 
 ASpellbladeMagicMissile::ASpellbladeMagicMissile()
 {
@@ -63,6 +65,8 @@ void ASpellbladeMagicMissile::OnProjectileBeginOverlap(UPrimitiveComponent* Over
 		if (UWarriorBlueprintFunctionLibrary::IsTargetPawnHostile(GetInstigator(), HitPawn))
 		{
 			BP_OnSpawnProjectileOverlapFX(SweepResult.ImpactPoint);
+			
+			HandleApplyInstigatorGameplayEffect(HitPawn);
 		}
 	}
 	
@@ -128,4 +132,30 @@ AActor* ASpellbladeMagicMissile::GetNearestTargetFromAvailableActors(const TArra
 	float NearestDistance = 0.0f;
 	
 	return UGameplayStatics::FindNearestActor(GetActorLocation(), InAvailableActors, NearestDistance);
+}
+
+void ASpellbladeMagicMissile::HandleApplyInstigatorGameplayEffect(AActor* InInstigator)
+{
+	if (!InstigatorGameplayEffectClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("忘记分配给%sInstigatorGameplayEffectClass"), *GetActorNameOrLabel());
+		
+		return;
+	}
+	
+	if (APawn* InstigatorPawn = GetInstigator())
+	{
+		if (UAbilitySystemComponent* InstigatorASC = 
+			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InstigatorPawn))
+		{
+			
+			FGameplayEffectContextHandle Context = InstigatorASC->MakeEffectContext();
+			Context.AddSourceObject(this);
+
+			FGameplayEffectSpecHandle Spec = InstigatorASC->MakeOutgoingSpec(
+				InstigatorGameplayEffectClass, AbilityLevel, Context);
+		
+			InstigatorASC->ApplyGameplayEffectSpecToSelf(*Spec.Data);
+		}
+	}
 }

@@ -6,6 +6,8 @@
 #include "Items/WarriorProjectileBase.h"
 #include "SpellbladeMagicMissile.generated.h"
 
+class UGameplayEffect;
+
 /**
  * 
  */
@@ -29,6 +31,7 @@ protected:
 	
 	void GetAvailableActorsToFly();
 	AActor* GetNearestTargetFromAvailableActors(const TArray<AActor*>& InAvailableActors);
+	void HandleApplyInstigatorGameplayEffect(AActor* InInstigator);
 	
 	UPROPERTY()
 	TArray<AActor*> AvailableActorsToFly;
@@ -53,6 +56,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Missile")
 	bool bShowPersistentDebugShape = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Missile")
+	TSubclassOf<UGameplayEffect> InstigatorGameplayEffectClass;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Missile", meta=(ExposeOnSpawn = "true"))
+	float AbilityLevel = 1.0f;
 	
 	UPROPERTY()
 	bool bShouldFaceToTarget = false;
