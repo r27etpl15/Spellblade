@@ -77,6 +77,10 @@ bool UWarriorHeroGameplayAbility::GetAbilityRemainingCooldownByTag(FGameplayTag 
 {
 	ensure(InCooldownTag.IsValid());
 	
+	// 初始化输出引脚防止在蓝图里被污染
+	TotalCooldownTime = 0.0f;
+	RemainingCooldownTime = 0.0f;
+	
 	FGameplayEffectQuery CooldownQuery = 
 		FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(InCooldownTag.GetSingleTagContainer());
 	
