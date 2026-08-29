@@ -1,6 +1,6 @@
 # Spellblade 魔剑士 — UE5 动作 ARPG
 
-[游戏演示视频](等待审核https://)
+[游戏演示视频](https://www.bilibili.com/video/BV1AH4C6wEb8/?share_source=copy_web&vd_source=92f3e22dd322afd6c14ab4ea29c7b8fb)
 
 ## 项目简介
 
