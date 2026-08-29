@@ -5,10 +5,9 @@
 | 属性 | 值 |
 |---|---|
 | 项目名称 | Spellblade |
-| C++ 模块 | Warrior |
 | 引擎版本 | Unreal Engine 5.6 |
-| 游戏类型 | 动作 RPG / 波次生存 |
-| 核心系统 | GAS（Gameplay Ability System）、Enhanced Input、Motion Warping、Behavior Tree AI |
+| 游戏类型 | 动作 ARPG |
+| 核心系统 | GAS（Gameplay Ability System）、Enhanced Input、Behavior Tree AI |
 
 ### 1.1 模块依赖
 
@@ -316,7 +315,7 @@ UGameplayAbility
 | 连击类型 | 公式 | 最大倍率 |
 |---|---|---|
 | 轻攻击 | `(ComboCount - 1) × 0.05 + 1.0` | 1.15x |
-| 重攻击 | `ComboCount × 0.15 + 1.0` | 1.30x |
+| 重攻击 | `ComboCount × 0.15 + 1.0` | 1.60x |
 
 ---
 
@@ -372,6 +371,30 @@ AActor
 | `ProjectileDamagePolicy` | OnHit（命中） / OnBeginOverlap（重叠） |
 
 **命中逻辑**：检测格挡（玩家有 `Player_Status_Blocking` + 点积验证），有效格挡发送 `Player_Event_SuccessfulBlock`，否则应用伤害 + 发送 `Shared_Event_HitReact`。
+
+#### 6.5.1 魔法飞弹 (`ASpellbladeMagicMissile`)
+
+继承自 `AWarriorProjectileBase`，实现链式弹射追踪：
+
+| 属性 | 说明 |
+|---|---|
+| `MaxOverlapNums` | 最大链式命中次数（默认 6） |
+| `CurrentOverlapNums` | 当前已命中次数（BlueprintReadOnly，供 UI 绑定） |
+| `BoxTraceDistance` / `TraceBoxSize` | BoxTrace 扫描参数 |
+| `CurrentFaceActor` | 当前追踪目标（`TWeakObjectPtr`） |
+| `RotationInterpSpeed` | 转向插值速度 |
+| `InstigatorGameplayEffectClass` | 命中时对施法者施加的 GE（如治疗 / 怒气回复） |
+| `AbilityLevel` | 从生成技能传入的等级（`ExposeOnSpawn`），用于 GE 等级缩放 |
+| `HitTargets` | 已命中目标去重数组，避免同一敌人被反复锁定 |
+| `bShouldFaceToTarget` | 是否持续追踪目标 |
+
+**核心逻辑**：
+
+1. **生成时扫描**（`BeginPlay`）：`BoxTraceMultiForObjects` 搜索范围内敌对目标，`FindNearestActor` 锁定最近目标
+2. **每帧追踪**（`Tick`）：`FMath::RInterpTo` 平滑转向目标，同步更新 `ProjectileMovementComponent->Velocity` 保持速度方向与朝向一致
+3. **命中时链式跳转**（`OnProjectileBeginOverlap`）：施加伤害 → 播放命中特效 → 目标加入 `HitTargets` 去重 → 重新 BoxTrace 扫描剩余目标 → 锁定下一个最近目标（排除已死亡和已命中者）
+4. **施法者回馈**（`HandleApplyInstigatorGameplayEffect`）：每次命中时对 `GetInstigator()` 施加 `InstigatorGameplayEffectClass`，用于实现命中回血、怒气回复等
+5. **链尽处理**：当 `AvailableActorsToFly` 为空或达到 `MaxOverlapNums` 时，`bShouldFaceToTarget = false`，弹射物直线飞出或超时自毁
 
 ### 6.6 格挡机制
 
